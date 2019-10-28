@@ -8,7 +8,7 @@ Even if there are other popular open source alternatives for LDAP directory serv
 
 This is an OpenLDAP based Docker image that can be deployed as OpenLDAP (multi) [master][4] and/or [slave][5] and a `stack.yml` that showcases a cluster deployment as described in the picture.
 
-![figure 1](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/iaean/d2sc/master/assets/figure1.dot)
+![figure 1](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/dta4/d2sc/master/assets/figure1.dot)
 
 We are providing it here, because we need a flexible centralized LDAP user management backend for our project and existing solutions like the cool stuff from [Osixia][6] doesn't fit perfectly for us.
 
@@ -47,7 +47,7 @@ Of course, you can build by your own as usual:
 docker build --tag=dsc dsc/
 ```
 
-[7]: https://hub.docker.com/r/iaean/d2sc
+[7]: https://hub.docker.com/r/dta4/d2sc
 [8]: https://www.eclipse.org/downloads/packages/release/photon/r
 [9]: https://directory.apache.org/studio/
 
