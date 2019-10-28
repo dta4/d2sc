@@ -1,0 +1,56 @@
+# dn: cn=config
+# objectClass: olcGlobal
+# cn: config
+#
+# dn: olcDatabase={0}config,cn=config
+# objectClass: olcDatabaseConfig
+# olcDatabase: {0}config
+# olcAccess: to dn.subtree="cn=config" by dn=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage by * none
+
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+# needed for master replication only
+olcConfigDir: /var/lib/openldap/slapd.d
+olcArgsFile: /var/lib/openldap/run/slapd.args
+olcAttributeOptions: lang-
+olcAuthzPolicy: none
+olcConcurrency: 0
+olcConnMaxPending: 32
+olcConnMaxPendingAuth: 128
+olcGentleHUP: TRUE
+olcIdleTimeout: 30
+olcLocalSSF: 71
+olcLogLevel: stats
+olcPidFile: /var/lib/openldap/run/slapd.pid
+olcReadOnly: FALSE
+olcSaslSecProps: noplain,noanonymous
+olcThreads: 8
+olcTLSCACertificateFile: /etc/ssl/cert.pem
+olcTLSCertificateFile: /var/lib/openldap/cert.pem
+olcTLSCertificateKeyFile: /var/lib/openldap/key.pem
+olcTLSCRLCheck: none
+olcTLSRandFile: /dev/urandom
+olcTLSDHParamFile: /var/lib/openldap/dh.pem
+olcToolThreads: 1
+olcWriteTimeout: 60
+
+include: file:///etc/openldap/slapd.schema.ldif
+include: file:///etc/openldap/schema/core.ldif
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcAccess: to * by group/groupOfNames/member.exact="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read by dn.base="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read by group/groupOfNames/member.exact="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by dn.base="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write
+olcAddContentAcl: TRUE
+olcLastMod: TRUE
+olcLimits: dn.base="cn=sync,ou=admins,{{DSC_DB_SUFFIX}}" size=unlimited time=unlimited
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcRootDN: cn=Configuration Manager,cn=config
+olcRootPW: {{DSC_ROOT_PASS}}
+olcSyncUseSubentry: FALSE
+{{#DSC_config_MASTERS}}
+olcSyncrepl: {{.}} searchbase="cn=config" filter="(!(objectClass=olcSyncProvConfig))" exattrs="olcServerID,olcMirrorMode,olcReadOnly" scope=sub schemachecking=on type=refreshAndPersist bindmethod=simple binddn="{{DSC_SYNC_DN}}" credentials="{{DSC_SYNC_PASS_CLEAR}}" tls_cert="/var/lib/openldap/cert.pem" tls_key="/var/lib/openldap/key.pem" tls_cacert="/etc/ssl/cert.pem" starttls=no tls_reqcert=allow network-timeout=5 keepalive=0:0:0 retry="60 720 600 +"
+{{/DSC_config_MASTERS}}
+olcMonitoring: FALSE

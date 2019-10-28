@@ -1,0 +1,115 @@
+dn: {{DSC_DB_SUFFIX}}
+objectClass: organization
+o: example
+
+dn: ou=admins,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+description: Directory Admin Root
+ou: admins
+
+dn: cn=sync,ou=admins,{{DSC_DB_SUFFIX}}
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+description: Directory Sync Replication Account
+cn: sync
+userPassword: {{DSC_SYNC_PASS}}
+
+dn: cn=admin,ou=admins,{{DSC_DB_SUFFIX}}
+objectClass: groupOfNames
+objectClass: simpleSecurityObject
+description: Directory Administrator(s)
+userPassword: {{DSC_ADMIN_PASS}}
+cn: admin
+member: cn=Directory Manager,{{DSC_DB_SUFFIX}}
+
+dn: cn=reader,ou=admins,{{DSC_DB_SUFFIX}}
+objectClass: groupOfNames
+objectClass: simpleSecurityObject
+description: Directory Reader(s)
+userPassword: {{DSC_READ_PASS}}
+cn: reader
+member: cn=sync,ou=admins,{{DSC_DB_SUFFIX}}
+
+### skip...
+
+dn: ou=PGPKeys,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+description: Public GPG Keys
+ou: PGPKeys
+
+dn: cn=PGPServerInfo,{{DSC_DB_SUFFIX}}
+objectClass: pgpServerInfo
+pgpSoftware: OpenLDAP
+pgpVersion: 2.4.48
+cn: PGPServerInfo
+pgpBaseKeySpaceDN: ou=PGPKeys,{{DSC_DB_SUFFIX}}
+
+dn: ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+ou: domains
+
+dn: ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+description: Domain Root
+ou: example.org
+
+dn: ou=admins,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+description: Domain Admin Root
+ou: admins
+
+dn: cn=admin,ou=admins,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: groupOfNames
+objectClass: simpleSecurityObject
+cn: admin
+description: Domain Administrator(s)
+userPassword: {{DSC_RAND_PASS}}
+member: cn=Directory Manager,{{DSC_DB_SUFFIX}}
+
+dn: cn=reader,ou=admins,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: groupOfNames
+objectClass: simpleSecurityObject
+description: Domain Reader(s)
+cn: reader
+userPassword: {{DSC_RAND_PASS}}
+member: cn=Directory Manager,{{DSC_DB_SUFFIX}}
+
+dn: ou=apps,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+description: Application aka Service Accounts
+ou: apps
+
+dn: cn=cli,ou=apps,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+description: LDAP CLI Tools via /etc/openldap/ldap.conf
+cn: cli
+userPassword: {{DSC_RAND_PASS}}
+
+dn: ou=users,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+description: Domain Users
+ou: users
+
+dn: uid=foobar,ou=users,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: simpleSecurityObject
+objectClass: ldapPublicKey
+uid: foobar
+cn: John Doe
+mail: John.Doe@example.org
+sn: Doe
+givenName: John
+userPassword: {{DSC_RAND_PASS}}
+
+dn: ou=groups,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: organizationalUnit
+description: Domain Groups
+ou: groups
+
+dn: cn=all,ou=groups,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}
+objectClass: groupOfURLs
+cn: all
+memberURL: ldap:///ou=users,ou=example.org,ou=domains,{{DSC_DB_SUFFIX}}??one?(&(objectClass=person)(userPassword=*))
