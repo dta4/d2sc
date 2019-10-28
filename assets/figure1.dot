@@ -1,0 +1,22 @@
+@startuml
+digraph d2sc {
+  layout=dot
+  nodesep=0.5
+  bgcolor=transparent
+
+  ingressLB [shape=egg style=filled fillcolor=darkslategray3]
+  masterA [shape=box style="rounded,filled" fillcolor=orange2]
+  masterB [shape=box style="rounded,filled" fillcolor=orange2]
+  slaveA [style=filled fillcolor=yellowgreen]
+  slaveB [style=filled fillcolor=yellowgreen]
+
+  masterA -> masterB [label=rw fontsize=9.0 color=slategrey dir=both]
+  slaveA -> {masterA masterB} [label=ro fontsize=9.0 color=slategrey]
+  slaveB -> {masterA masterB} [label=ro fontsize=9.0 color=slategrey]
+  ingressLB -> {masterA masterB} [label=rw fontsize=9.0 dir=both]
+  ingressLB -> {slaveA slaveB}   [label=ro fontsize=9.0]
+
+  {rank=same; masterA, masterB}
+  {rank=same; slaveA, slaveB}
+}
+@enduml

@@ -1,0 +1,193 @@
+# dn: cn=config
+# objectClass: olcGlobal
+# cn: config
+#
+# dn: olcDatabase={0}config,cn=config
+# objectClass: olcDatabaseConfig
+# olcDatabase: {0}config
+# olcAccess: to dn.subtree="cn=config" by dn=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage by * none
+
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+# needed for master replication only
+{{#DSC_SERVER_IDS}}
+olcServerID: {{.}}
+{{/DSC_SERVER_IDS}}
+olcConfigDir: /var/lib/openldap/slapd.d
+olcArgsFile: /var/lib/openldap/run/slapd.args
+olcAttributeOptions: lang-
+olcAuthzPolicy: none
+olcConcurrency: 0
+olcConnMaxPending: 32
+olcConnMaxPendingAuth: 128
+olcGentleHUP: TRUE
+olcIdleTimeout: 30
+olcLocalSSF: 71
+olcLogLevel: stats
+olcPidFile: /var/lib/openldap/run/slapd.pid
+olcReadOnly: FALSE
+olcSaslSecProps: noplain,noanonymous
+olcThreads: 8
+olcTLSCACertificateFile: /etc/ssl/cert.pem
+olcTLSCertificateFile: /var/lib/openldap/cert.pem
+olcTLSCertificateKeyFile: /var/lib/openldap/key.pem
+olcTLSCRLCheck: none
+olcTLSRandFile: /dev/urandom
+olcTLSDHParamFile: /var/lib/openldap/dh.pem
+olcToolThreads: 1
+olcWriteTimeout: 60
+
+dn: cn=module{0},cn=config
+objectClass: olcModuleList
+cn: module{0}
+olcModulepath: /usr/lib/openldap
+olcModuleload: {0}back_mdb.so
+olcModuleload: {1}back_monitor.so
+# needed for master replication only
+olcModuleLoad: {2}syncprov.so
+olcModuleLoad: {3}unique.so
+olcModuleLoad: {4}memberof.so
+olcModuleLoad: {5}dynlist.so
+olcModuleLoad: {6}refint.so
+olcModuleLoad: {7}constraint.so
+
+include: file:///etc/openldap/slapd.schema.ldif
+include: file:///etc/openldap/schema/core.ldif
+include: file:///etc/openldap/schema/cosine.ldif
+include: file:///etc/openldap/schema/duaconf.ldif
+include: file:///etc/openldap/schema/dyngroup.ldif
+include: file:///etc/openldap/schema/inetorgperson.ldif
+include: file:///etc/openldap/schema/openldap.ldif
+include: file:///etc/openldap/schema/ppolicy.ldif
+include: file:///etc/openldap/schema/nis.ldif
+include: file:///etc/openldap/schema/pmi.ldif
+include: file:///etc/openldap/schema/misc.ldif
+include: file:///etc/openldap/schema/openssh.ldif
+include: file:///etc/openldap/schema/pgp.ldif
+include: file:///etc/openldap/schema/samba.ldif
+include: file:///etc/openldap/schema/apple.ldif
+include: file:///etc/openldap/schema/radius.ldif
+include: file:///etc/openldap/schema/mail.ldif
+include: file:///etc/openldap/schema/tacacs.ldif
+include: file:///etc/openldap/schema/trust.ldif
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcAddContentAcl: TRUE
+olcLastMod: TRUE
+olcLimits: dn.base="cn=sync,ou=admins,{{DSC_DB_SUFFIX}}" size=unlimited time=unlimited
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcRootDN: cn=Configuration Manager,cn=config
+olcRootPW: {{DSC_ROOT_PASS}}
+olcSyncUseSubentry: FALSE
+{{#DSC_config_MASTERS}}
+olcSyncrepl: {{.}} searchbase="cn=config" filter="(objectclass=*)" scope=sub schemachecking=on type=refreshAndPersist bindmethod=simple binddn="{{DSC_SYNC_DN}}" credentials="{{DSC_SYNC_PASS_CLEAR}}" tls_cert="/var/lib/openldap/cert.pem" tls_key="/var/lib/openldap/key.pem" tls_cacert="/etc/ssl/cert.pem" starttls=no tls_reqcert=allow network-timeout=5 keepalive=0:0:0 retry="60 720 600 +"
+{{/DSC_config_MASTERS}}
+olcMirrorMode: TRUE
+olcMonitoring: FALSE
+olcAccess: to * by group/groupOfNames/member.exact="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read by dn.base="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read by group/groupOfNames/member.exact="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by dn.base="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write
+
+dn: olcOverlay={0}syncprov,olcDatabase={0}config,cn=config
+objectClass: olcSyncProvConfig
+objectClass: olcOverlayConfig
+olcOverlay: {0}syncprov
+
+dn: olcDatabase={1}monitor,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {1}monitor
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcRootDN: cn=Monitor Manager,cn=monitor
+olcRootPW: {{DSC_ROOT_PASS}}
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+olcAccess: {0}to * by group/groupOfNames/member.exact="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read by dn.base="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read
+
+dn: olcDatabase={2}mdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: {2}mdb
+olcDbDirectory: /var/lib/openldap/db
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcLimits: dn.base="cn=sync,ou=admins,{{DSC_DB_SUFFIX}}" size=unlimited time=unlimited
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+# See slappasswd(8) and slapd-config(5) for details.
+# Use of strong authentication encouraged.
+olcRootPW: {{DSC_ROOT_PASS}}
+olcSuffix: {{DSC_DB_SUFFIX}}
+olcRootDN: cn=Directory Manager,{{DSC_DB_SUFFIX}}
+olcSyncUseSubentry: FALSE
+olcMirrorMode: TRUE
+olcMonitoring: TRUE
+olcDbMode: 0600
+olcDbIndex: default sub
+olcDbIndex: objectClass eq
+olcDbIndex: entryUUID eq
+olcDbIndex: entryCSN eq
+olcDbIndex: cn pres,eq,approx,sub,subany
+olcDbIndex: ou eq
+olcDbIndex: o eq
+olcAccess: to dn.regex="ou=PGPKeys,ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" by dn.one,expand="ou=users,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" write by dn.base="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by dn.base,expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" write by group/groupOfNames/member.exact="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by group/groupOfNames/member.expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" write by * read
+olcAccess: to dn.regex="cn=pgpServerInfo,ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" by dn.base="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by dn.base,expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" write by group/groupOfNames/member.exact="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by group/groupOfNames/member.expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" write by * read
+olcAccess: to dn.base="cn=sysMonitorDN,ou=admins,{{DSC_DB_SUFFIX}}" by dn.base="cn=sync,ou=admins,{{DSC_DB_SUFFIX}}" write by * +0 break
+olcAccess: to dn.regex="^(.+,)?ou=(idmap|machines),ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" by dn.base,expand="cn=samba,ou=admins,ou=$3,ou=domains,{{DSC_DB_SUFFIX}}" write by * +0 break
+olcAccess: to dn.regex="^(.+,)?ou=users,ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" attrs=userPassword,sambaNTPassword,sambaLMPassword by dn.base,expand="cn=samba,ou=admins,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" write by * +0 break
+olcAccess: to dn.regex="uid=([^,]+),ou=users,ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" attrs=children by dn.base,expand="uid=$1,ou=users,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" write by * +0 break
+olcAccess: to attrs=userPassword,sambaNTPassword,sambaLMPassword by self write by anonymous auth by * +0 break
+olcAccess: to attrs=mailForwardingAddress,mailAlternateAddress,telephoneNumber,mobile,roomNumber,sambaPwdLastSet,jpegPhoto,pgpCertID,sshPublicKey by self write by * +0 break
+olcAccess: to dn.regex="^(.+,)?ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" attrs=entry,children,objectClass,uid,givenName,sn,cn,mail,title,departmentNumber,mobile,telephoneNumber,facsimileTelephoneNumber,jpegPhoto,pgpCertID,member,memberUid by group/groupOfNames/member.exact="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" read break by group/groupOfNames/member.exact="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read break by group/groupOfNames/member.expand="cn=admin,ou=admins,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" read break by group/groupOfNames/member.expand="cn=reader,ou=admins,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" read break by dn.one,expand="ou=users,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" read by * +0 break
+# olcAccess: to dn.regex="^ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" attrs=service by group/groupOfNames/member.expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" none by dn.base,expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" none by * +0 break
+# olcAccess: to dn.regex="^ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" attrs=objectClass val.exact="disoxDomain" by group/groupOfNames/member.expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" none by dn.base,expand="cn=admin,ou=admins,ou=$1,ou=domains,{{DSC_DB_SUFFIX}}" none by * +0 break
+olcAccess: to dn.regex="^(.+,)?ou=([^,]+),ou=domains,{{DSC_DB_SUFFIX}}$" by group/groupOfNames/member.exact="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by group/groupOfNames/member.exact="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read continue by group/groupOfNames/member.expand="cn=admin,ou=admins,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" write by group/groupOfNames/member.expand="cn=reader,ou=admins,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" read by dn.base,expand="cn=admin,ou=admins,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" write by dn.one,expand="ou=admins,ou=$2,ou=domains,{{DSC_DB_SUFFIX}}" read by * +0 break
+olcAccess: to * by group/groupOfNames/member.exact="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by group/groupOfNames/member.exact="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read by dn.base="cn=admin,ou=admins,{{DSC_DB_SUFFIX}}" write by dn.base="cn=reader,ou=admins,{{DSC_DB_SUFFIX}}" read by dn.base="cn=sync,ou=admins,{{DSC_DB_SUFFIX}}" read by self read by * none
+{{#DSC_db_MASTERS}}
+olcSyncrepl: {{.}} searchbase="{{DSC_DB_SUFFIX}}" filter="(objectclass=*)" scope=sub schemachecking=on type=refreshAndPersist bindmethod=simple binddn="{{DSC_SYNC_DN}}" credentials="{{DSC_SYNC_PASS_CLEAR}}" tls_cert="/var/lib/openldap/cert.pem" tls_key="/var/lib/openldap/key.pem" tls_cacert="/etc/ssl/cert.pem" starttls=no tls_reqcert=allow network-timeout=5 keepalive=0:0:0 retry="60 720 600 +"
+{{/DSC_db_MASTERS}}
+
+# needed for master replication only
+dn: olcOverlay={0}syncprov,olcDatabase={2}mdb,cn=config
+objectClass: olcSyncProvConfig
+objectClass: olcOverlayConfig
+olcOverlay: {0}syncprov
+
+dn: olcOverlay={1}unique,olcDatabase={2}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcUniqueConfig
+olcOverlay: {1}unique
+
+dn: olcOverlay={2}memberof,olcDatabase={2}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcMemberOf
+olcOverlay: {2}memberof
+olcMemberOfDN: cn=MemberOfOverlay
+olcMemberOfDangling: ignore
+olcMemberOfRefInt: TRUE
+olcMemberOfGroupOC: groupOfNames
+olcMemberOfMemberAD: member
+olcMemberOfMemberOfAD: memberOf
+
+dn: olcOverlay={3}dynlist,olcDatabase={2}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcDynamicList
+olcOverlay: {3}dynlist
+olcDlAttrSet: {0}groupOfURLs memberURL member
+olcDlAttrSet: {1}posixGroup labeledURI
+
+dn: olcOverlay={4}constraint,olcDatabase={2}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcConstraintConfig
+olcOverlay: {4}constraint
+olcConstraintAttribute: userPassword count 1
+
+dn: olcOverlay={5}refint,olcDatabase={2}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcRefintConfig
+olcOverlay: {5}refint
+olcRefintModifiersName: cn=ReferentialIntegrityOverlay

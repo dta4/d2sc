@@ -1,0 +1,106 @@
+# docker stack deploy -c stack.yml pdns
+# or: docker-compose -f stack.yml up
+# visit: http[s]://swarm-ip, http[s]://localhost, or http[s]://host-ip
+
+version: '3.1'
+
+services:
+
+  dsc-master1:
+    image: dsc-node
+    build: dsc
+    container_name: dsc-master1
+    restart: always
+    environment:
+      DSC_SERVER_ID: 1
+      DSC_MASTERS: "ldap://dsc-master1 ldap://dsc-master2"
+    networks:
+      - dsc
+    dns_search: .
+    volumes:
+      - dsc-master1:/var/lib/openldap:z
+
+  dsc-master2:
+    image: dsc-node
+    build: dsc
+    container_name: dsc-master2
+    restart: always
+    environment:
+      DSC_SERVER_ID: 2
+      DSC_NEXUS: "dsc-master1:389"
+      DSC_MASTERS: "ldap://dsc-master1 ldap://dsc-master2"
+    networks:
+      - dsc
+    dns_search: .
+    volumes:
+      - dsc-master2:/var/lib/openldap:z
+
+  dsc-slave1:
+    image: dsc-node
+    build: dsc
+    container_name: dsc-slave1
+    restart: always
+    environment:
+      DSC_SLAVE: "yes"
+      DSC_NEXUS: "dsc-master1:389"
+      DSC_MASTERS: "ldap://dsc-master1 ldap://dsc-master2"
+    networks:
+      - dsc
+    dns_search: .
+    volumes:
+      - dsc-slave1:/var/lib/openldap:z
+    depends_on:
+      - dsc-master1
+      - dsc-master2
+
+  dsc-slave2:
+    image: dsc-node
+    build: dsc
+    container_name: dsc-slave2
+    restart: always
+    environment:
+      DSC_SLAVE: "yes"
+      DSC_NEXUS: "dsc-master1:389"
+      DSC_MASTERS: "ldap://dsc-master1 ldap://dsc-master2"
+    networks:
+      - dsc
+    dns_search: .
+    volumes:
+      - dsc-slave2:/var/lib/openldap:z
+    depends_on:
+      - dsc-master1
+      - dsc-master2
+
+  dsc-lb:
+    image: dsc-lb
+    build: lb
+    container_name: dsc-lb
+    restart: always
+    environment:
+      DSC_MASTERS: "dsc-master1 dsc-master2"
+      DSC_SLAVES: "dsc-slave1 dsc-slave2"
+      CERTBOT_CRT_URL: "http://certbot/localhost/cert.pem"
+      CERTBOT_KEY_URL: "http://certbot/localhost/privkey.pem"
+      CERTBOT_USER: "admin"
+      CERTBOT_PASS: "foobar"
+    networks:
+      - dsc
+    dns_search: .
+    ports:
+      - 636:636
+      - 42636:42636
+    depends_on:
+      - dsc-master1
+      - dsc-master2
+      - dsc-slave1
+      - dsc-slave2
+
+volumes:
+  dsc-master1:
+  dsc-master2:
+  dsc-slave1:
+  dsc-slave2:
+
+networks:
+  dsc:
+    external: false
