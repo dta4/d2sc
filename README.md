@@ -1,3 +1,5 @@
+![](https://github.com/iaean/d2sc/workflows/Dockerization%20CI/badge.svg)
+
 ## d2sc - dockerized directory service cluster
 
 **A docker image to run an OpenLDAP cluster.**
