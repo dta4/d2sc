@@ -2,6 +2,7 @@ name: Dockerization CI
 on: [push]
 jobs:
   build:
+    name: docker build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -9,3 +10,10 @@ jobs:
       run: |
         docker build ./dsc/ --tag dsc-node:latest
         docker build ./lb/ --tag dsc-lb:latest
+  publish:
+    name: docker push
+    runs-on: ubuntu-latest
+    steps:
+    - name: Publish docker images
+      run: |
+        docker images
