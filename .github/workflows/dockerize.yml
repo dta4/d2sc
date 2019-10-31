@@ -1,6 +1,8 @@
 name: Dockerization CI
 on:
   push:
+    # paths:
+    #   - 'sub-project/**'
     paths-ignore:
       - '**.md'
 jobs:
