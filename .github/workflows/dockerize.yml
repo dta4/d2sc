@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build docker images
       run: |
-        printenv
+        printenv | grep GITHUB_
         # docker build ./dsc/ --tag dsc-node:latest
         # docker build ./lb/ --tag dsc-lb:latest
 #  publish:
