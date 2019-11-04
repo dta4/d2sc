@@ -7,15 +7,21 @@ on:
       - '**.md'
 jobs:
   build:
-    name: docker build
+    name: dockerize
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Build docker images
+    - name: Print environment
       run: |
         printenv | grep GITHUB_
-        # docker build ./dsc/ --tag dsc-node:latest
-        # docker build ./lb/ --tag dsc-lb:latest
+    - name: Build and publish
+      uses: iaean/ci/dockerize@master
+      with:
+        name: myDocker/repository
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+
 #  publish:
 #    name: docker push
 #    runs-on: ubuntu-latest
