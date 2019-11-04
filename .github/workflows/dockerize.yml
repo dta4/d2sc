@@ -1,4 +1,4 @@
-name: Dockerization CI
+name: Dockerization
 on:
   push:
     # paths:
