@@ -20,9 +20,16 @@ jobs:
         name: myDocker/repository
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+        workdir: dsc
+        tag_names: true
+    - name: Build and publish
+      uses: iaean/ci/dockerize@master
+      with:
+        name: myDocker/repository
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
         workdir: lb
         tag_names: true
-
 
 #  publish:
 #    name: docker push
