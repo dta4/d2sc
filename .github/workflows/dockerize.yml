@@ -18,11 +18,15 @@ jobs:
       uses: iaean/ci/dockerize@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
         context: dsc
     - name: Build and publish
       uses: iaean/ci/dockerize@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
         context: lb
 
 #  publish:
