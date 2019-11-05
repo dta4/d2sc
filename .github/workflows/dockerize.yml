@@ -17,10 +17,12 @@ jobs:
     - name: Build and publish
       uses: iaean/ci/dockerize@master
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         context: dsc
     - name: Build and publish
       uses: iaean/ci/dockerize@master
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         context: lb
 
 #  publish:
