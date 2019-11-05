@@ -28,11 +28,6 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         context: lb
-    - name: List fs root env
-      run: |
-        ls -al /github/*
-        ls -al /github/home/.docker/
-        cat /github/home/.docker/config.json
 
 #  publish:
 #    name: docker push
