@@ -28,3 +28,4 @@ jobs:
         image-suffixing: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
         docker-token: ${{ secrets.DOCKER_TOKEN }}
+
