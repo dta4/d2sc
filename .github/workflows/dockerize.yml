@@ -14,20 +14,20 @@ jobs:
     - name: Print environment
       run: |
         printenv | grep GITHUB_
-    - name: Build and publish
+    - name: Build and publish OpenLDAP
       uses: iaean/ci/dockerize@master
       with:
         context: dsc
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        docker_token: ${{ secrets.DOCKER_TOKEN }}
-    - name: Build and publish
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        docker-token: ${{ secrets.DOCKER_TOKEN }}
+    - name: Build and publish NGINX
       uses: iaean/ci/dockerize@master
       with:
         context: lb
         image: dsc-proxy
-        append-image-suffix: true
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        docker_token: ${{ secrets.DOCKER_TOKEN }}
+        image-suffixing: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        docker-token: ${{ secrets.DOCKER_TOKEN }}
 
 #  publish:
 #    name: docker push
