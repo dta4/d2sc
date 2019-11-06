@@ -1,4 +1,4 @@
-![](https://github.com/iaean/d2sc/workflows/dockerize.yml/badge.svg)
+![](https://github.com/iaean/d2sc/workflows/Dockerization/badge.svg)
 
 ## d2sc - dockerized directory service cluster
 
