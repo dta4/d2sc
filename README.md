@@ -1,3 +1,5 @@
+![](https://github.com/dta4/d2sc/workflows/Dockerization/badge.svg)
+
 ## d2sc - dockerized directory service cluster
 
 **A docker image to run an OpenLDAP cluster.**

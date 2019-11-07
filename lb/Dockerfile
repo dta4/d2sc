@@ -12,7 +12,7 @@ LABEL org.opencontainers.image.authors="Andreas Schulze <asl@iaean.net>" \
 
 RUN apk --update upgrade && \
     apk add --no-cache \
-        ca-certificates curl less bash busybox-extras \
+        ca-certificates coreutils curl less bash busybox-extras \
         sudo wget dcron openssl bind-tools
 
 ENV MO_VERSION="2.1.0"

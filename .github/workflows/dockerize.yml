@@ -1,0 +1,30 @@
+name: Dockerization
+on:
+  push:
+    # paths:
+    #   - 'sub-project/**'
+    paths-ignore:
+      - '**.md'
+jobs:
+  build:
+    name: dockerize
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Print environment
+      run: |
+        printenv | grep GITHUB_
+    - name: Build and publish OpenLDAP
+      uses: dta4/hub/dockerize@master
+      with:
+        context: dsc
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        docker_token: ${{ secrets.DOCKER_TOKEN }}
+    - name: Build and publish NGINX
+      uses: dta4/hub/dockerize@master
+      with:
+        context: lb
+        image: dsc-proxy
+        image_suffixing: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        docker_token: ${{ secrets.DOCKER_TOKEN }}
